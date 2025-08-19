@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Grupo Scout Séptimo de Montevideo</title>
+  <meta name="description" content="Grupo Scout Séptimo de Montevideo: servicio, naturaleza y comunidad." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css" />
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#">
+      <img src="assets/logo.png" alt="Logo Grupo Scout Séptimo de Montevideo" />
+      <span>Grupo Scout 7º de Montevideo</span>
+    </a>
+    <nav class="nav">
+      <a href="#sobre">Sobre</a>
+      <a href="#noticias">Noticias</a>
+      <a href="#blog">Blog</a>
+      <a class="btn-cta" href="#contacto">Contacto</a>
+    </nav>
+    <button class="nav-toggle" aria-label="Abrir menú">☰</button>
+  </header>
+
+  <!-- HERO con Glassmorphism -->
+  <section class="hero">
+    <div class="hero-bg">
+      <img class="hojas" src="assets/hojas.svg" alt="" aria-hidden="true">
+    </div>
+    <div class="glass-card">
+      <h1>Explorar. Servir. Crecer.</h1>
+      <p>Somos el <strong>Grupo Scout Séptimo de Montevideo</strong>. Amistad, valores y naturaleza para todas las edades.</p>
+      <div class="hero-actions">
+        <a href="#noticias" class="btn primary">Ver Noticias</a>
+        <a href="#sobre" class="btn subtle">Conocenos</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOBRE NOSOTROS -->
+  <section id="sobre" class="section">
+    <div class="section-heading">
+      <h2>Sobre Nosotros</h2>
+      <p>Educación no formal al aire libre, vida en patrullas y servicio a la comunidad.</p>
+    </div>
+    <div class="about-grid">
+      <article class="about-item">
+        <h3>Nuestra Historia</h3>
+        <p>Nacimos para formar personas comprometidas con su comunidad, con espíritu scout y amor por la naturaleza.</p>
+      </article>
+      <article class="about-item">
+        <h3>Qué Hacemos</h3>
+        <p>Actividades semanales, campamentos, proyectos de servicio y aprendizaje por la acción.</p>
+      </article>
+      <article class="about-item">
+        <h3>Ramas</h3>
+        <p>Lobatos, Scouts, Caminantes y Rovers. Cada etapa, un desafío y una aventura.</p>
+      </article>
+    </div>
+    <!-- Galería ligera (colocá tus imágenes reales) -->
+    <div class="gallery">
+      <figure><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900&q=80" alt="Salida al bosque"><figcaption>Salidas a la naturaleza</figcaption></figure>
+      <figure><img src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=900&q=80" alt="Fogata"><figcaption>Fogatas y campamentos</figcaption></figure>
+      <figure><img src="https://images.unsplash.com/photo-1493244040629-496f6d136cc3?w=900&q=80" alt="Trabajo en equipo"><figcaption>Trabajo en equipo</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- NOTICIAS -->
+  <section id="noticias" class="section">
+    <div class="section-heading">
+      <h2>Noticias</h2>
+      <p>Publicadas por la comunidad del Grupo (vía CMS).</p>
+      <a class="chip" href="/admin/" title="Abrir panel de publicaciones">+ Publicar</a>
+    </div>
+    <div id="news-list" class="cards-grid" aria-live="polite">
+      <!-- JS inyecta tarjetas -->
+    </div>
+    <div class="section-actions">
+      <button class="btn outline" data-more="news">Cargar más</button>
+    </div>
+  </section>
+
+  <!-- BLOG -->
+  <section id="blog" class="section alt">
+    <div class="section-heading">
+      <h2>Blog</h2>
+      <p>Crónicas, reflexiones y experiencias.</p>
+      <a class="chip" href="/admin/" title="Abrir panel de publicaciones">+ Escribir</a>
+    </div>
+    <div id="blog-list" class="cards-grid" aria-live="polite">
+      <!-- JS inyecta tarjetas -->
+    </div>
+    <div class="section-actions">
+      <button class="btn outline" data-more="blog">Cargar más</button>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section id="contacto" class="section">
+    <div class="section-heading">
+      <h2>Contacto</h2>
+      <p>Escribinos o encontranos en redes.</p>
+    </div>
+
+    <div class="contact-wrap">
+      <form name="contacto" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="glass-form">
+        <input type="hidden" name="form-name" value="contacto" />
+        <p class="hidden">
+          <label>Si sos humano dejá esto en blanco: <input name="bot-field" /></label>
+        </p>
+        <label>
+          Nombre
+          <input type="text" name="nombre" required />
+        </label>
+        <label>
+          Email
+          <input type="email" name="email" required />
+        </label>
+        <label>
+          Mensaje
+          <textarea name="mensaje" rows="4" required></textarea>
+        </label>
+        <button class="btn primary" type="submit">Enviar</button>
+      </form>
+
+      <div class="contact-info">
+        <ul class="list">
+          <li><strong>Email:</strong> contacto@grupo7montevideo.org</li>
+          <li><strong>Instagram:</strong> <a href="#" rel="noopener">/grupo7mo</a></li>
+          <li><strong>Facebook:</strong> <a href="#" rel="noopener">/grupo7mo</a></li>
+          <li><strong>Ubicación:</strong> Montevideo, Uruguay</li>
+        </ul>
+        <div class="map-embed">
+          <iframe
+            title="Mapa Montevideo"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps?q=Montevideo,+Uruguay&output=embed">
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <p>© <span id="year"></span> Grupo Scout 7º de Montevideo — Siempre Listos</p>
+  </footer>
+
+  <script src="assets/marked.min.js"></script>
+  <script src="assets/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+backend:
+  name: github            # o "git-gateway" si usás Netlify Identity
+  branch: main
+  repo: tu-usuario/grupo-scout-7mo  # ← CAMBIAR
+media_folder: "assets/uploads"      # dónde guarda las imágenes en el repo
+public_folder: "/assets/uploads"    # cómo se referencian en el sitio
+publish_mode: editorial_workflow
+
+locale: "es"
+
+collections:
+  - name: "noticias"
+    label: "Noticias"
+    folder: "content/noticias"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Título", name: "title", widget: "string" }
+      - { label: "Fecha", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "Autor", name: "author", widget: "string", required: false }
+      - { label: "Resumen", name: "excerpt", widget: "text", required: false }
+      - { label: "Imagen de portada", name: "cover", widget: "image", required: false }
+      - { label: "Contenido", name: "body", widget: "markdown" }
+
+  - name: "blog"
+    label: "Blog"
+    folder: "content/blog"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Título", name: "title", widget: "string" }
+      - { label: "Fecha", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "Autor", name: "author", widget: "string", required: false }
+      - { label: "Resumen", name: "excerpt", widget: "text", required: false }
+      - { label: "Imagen de portada", name: "cover", widget: "image", required: false }
+      - { label: "Contenido", name: "body", widget: "markdown" }
