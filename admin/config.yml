@@ -1,11 +1,12 @@
 backend:
-  name: git-gateway            # o "git-gateway" si usás Netlify Identity
+  name: github
+  repo: bolioliagustin/grupo-scout-7mo   # ← CAMBIAR
   branch: main
-  repo: bolioliagustin/grupo-scout-7mo  # ← CAMBIAR
-media_folder: "assets/uploads"      # dónde guarda las imágenes en el repo
-public_folder: "/assets/uploads"    # cómo se referencian en el sitio
-publish_mode: editorial_workflow
+  # (no hace falta auth_endpoint si usás el OAuth de Netlify)
 
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+publish_mode: editorial_workflow
 locale: "es"
 
 collections:
@@ -13,7 +14,7 @@ collections:
     label: "Noticias"
     folder: "content/noticias"
     create: true
-    slug: "{{slug}}"
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
       - { label: "Título", name: "title", widget: "string" }
       - { label: "Fecha", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
@@ -26,7 +27,7 @@ collections:
     label: "Blog"
     folder: "content/blog"
     create: true
-    slug: "{{slug}}"
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
       - { label: "Título", name: "title", widget: "string" }
       - { label: "Fecha", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
