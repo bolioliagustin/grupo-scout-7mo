@@ -1,5 +1,5 @@
 /* Configuración — CAMBIÁ ESTO por tu repo público de GitHub */
-const GITHUB_OWNER = "tu-usuario";   // ← reemplazar
+const GITHUB_OWNER = "bolioliagustin";   // ← reemplazar
 const GITHUB_REPO  = "grupo-scout-7mo"; // ← reemplazar
 const BRANCH = "main";
 
