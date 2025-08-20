@@ -1,5 +1,5 @@
 backend:
-  name: github            # o "git-gateway" si usás Netlify Identity
+  name: git-gateway            # o "git-gateway" si usás Netlify Identity
   branch: main
   repo: bolioliagustin/grupo-scout-7mo  # ← CAMBIAR
 media_folder: "assets/uploads"      # dónde guarda las imágenes en el repo
