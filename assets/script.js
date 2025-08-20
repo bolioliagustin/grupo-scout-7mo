@@ -1,97 +1,116 @@
-/* Configuración — CAMBIÁ ESTO por tu repo público de GitHub */
 const GITHUB_OWNER = "bolioliagustin";   // ← reemplazar
 const GITHUB_REPO  = "grupo-scout-7mo"; // ← reemplazar
 const BRANCH = "main";
 
-/**
- * Este script:
- * 1) Alterna menú mobile
- * 2) Inserta año en footer
- * 3) Carga Noticias y Blog desde /content usando la GitHub API pública
- *    y renderiza Markdown con Marked
- */
+/* Estado de paginación */
+const paginationState = { noticias: { page: 0 }, blog: { page: 0 } };
+const PAGE_SIZE = 6;
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Año
-  document.getElementById("year").textContent = new Date().getFullYear();
+  // Año footer
+  const y = document.getElementById("year");
+  if (y) y.textContent = new Date().getFullYear();
 
   // Menú móvil
   const toggle = document.querySelector(".nav-toggle");
   const nav = document.querySelector(".nav");
   toggle?.addEventListener("click", () => nav.classList.toggle("open"));
 
-  // Cargar contenidos
+  // Cargar colecciones iniciales
   loadCollection("noticias", "#news-list");
   loadCollection("blog", "#blog-list");
 
-  // Botón "Cargar más"
+  // FIX: botones "Cargar más" usan la MISMA clave de colección
   document.querySelectorAll("[data-more]").forEach(btn => {
-    btn.addEventListener("click", async (e) => {
-      const type = btn.dataset.more;
-      await loadCollection(type, type === "news" ? "#news-list" : "#blog-list", { append: true });
+    btn.addEventListener("click", async () => {
+      const collection = btn.dataset.more; // ahora "noticias" o "blog"
+      await loadCollection(collection, collection === "noticias" ? "#news-list" : "#blog-list", { append: true });
     });
   });
 });
 
-/**
- * Lista archivos de un directorio del repo vía GitHub API (público).
- */
+/* Listar directorio del repo en GitHub */
 async function listRepoDir(path) {
   const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}?ref=${BRANCH}`;
   const res = await fetch(url);
-  if (!res.ok) throw new Error("No se pudo listar: " + path);
-  return res.json(); // array de archivos
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`GitHub ${res.status} en ${path}: ${txt}`);
+  }
+  return res.json();
 }
 
-/** Cache simple de paginación por colección */
-const paginationState = { noticias: { page: 0 }, blog: { page: 0 } };
-const PAGE_SIZE = 6;
-
-/**
- * Carga y renderiza una colección (noticias/blog)
- */
+/* Cargar colección y renderizar tarjetas */
 async function loadCollection(collection, targetSelector, { append = false } = {}) {
   const target = document.querySelector(targetSelector);
+  if (!target) return;
+
   if (!append) target.innerHTML = ""; // reset si no es append
 
   try {
+    console.log(`[${collection}] listando…`);
     const state = paginationState[collection];
     const list = await listRepoDir(`content/${collection}`);
-    // Filtrar .md y ordenar por fecha si el filename incluye ISO en el front (opcional)
+
     const mdFiles = list
-      .filter(item => item.type === "file" && item.name.endsWith(".md"))
-      .sort((a, b) => a.name < b.name ? 1 : -1); // inverso aprox por nombre
+      .filter(item => item.type === "file" && item.name.endsWith(".md"));
 
-    // Paginar
-    const start = state.page * PAGE_SIZE;
-    const slice = mdFiles.slice(start, start + PAGE_SIZE);
-    state.page += 1;
-
-    for (const file of slice) {
-      const { content, metadata } = await fetchMarkdownWithFrontmatter(file.download_url);
-      const card = buildCard(content, metadata, collection);
-      target.appendChild(card);
+    if (mdFiles.length === 0) {
+      target.innerHTML = `<div>No hay publicaciones en <strong>${collection}</strong> todavía.</div>`;
+      hideLoadMore(collection);
+      return;
     }
 
-    // ocultar botón si no hay más
-    const remaining = mdFiles.length - (state.page * PAGE_SIZE);
-    const btn = document.querySelector(`[data-more="${collection === "noticias" ? "news" : "blog"}"]`);
-    if (remaining <= 0 && btn) btn.style.display = "none";
+    // Descargamos todas y ordenamos por fecha del frontmatter (desc)
+    const all = await Promise.all(mdFiles.map(async f => {
+      const { content, metadata } = await fetchMarkdownWithFrontmatter(f.download_url);
+      return { content, metadata };
+    }));
+
+    all.sort((a,b) => {
+      const da = new Date(a.metadata.date || 0).getTime();
+      const db = new Date(b.metadata.date || 0).getTime();
+      return db - da;
+    });
+
+    // Paginación
+    const start = state.page * PAGE_SIZE;
+    const slice = all.slice(start, start + PAGE_SIZE);
+    state.page += 1;
+
+    slice.forEach(item => {
+      const card = buildCard(item.content, item.metadata, collection);
+      target.appendChild(card);
+    });
+
+    // Botón cargar más
+    const remaining = all.length - (state.page * PAGE_SIZE);
+    if (remaining <= 0) hideLoadMore(collection);
+
+    console.log(`[${collection}] renderizadas ${slice.length} / total ${all.length}`);
   } catch (err) {
     console.error(err);
-    const div = document.createElement("div");
-    div.textContent = "No pudimos cargar " + collection + ". Verificá la configuración del repo.";
-    target.appendChild(div);
+    target.innerHTML = `
+      <div style="padding:12px;border:1px solid #0001;border-radius:10px;background:#fff">
+        Ocurrió un error al cargar <strong>${collection}</strong>.<br/>
+        <small>${err.message}</small>
+      </div>`;
+    hideLoadMore(collection);
   }
 }
 
-/**
- * Descarga Markdown y separa Frontmatter YAML si existe
- */
+function hideLoadMore(collection){
+  const key = collection; // "noticias" | "blog"
+  const btn = document.querySelector(`[data-more="${key}"]`);
+  if (btn) btn.style.display = "none";
+}
+
+/* Descargar Markdown y extraer frontmatter */
 async function fetchMarkdownWithFrontmatter(rawUrl) {
   const res = await fetch(rawUrl);
-  if (!res.ok) throw new Error("Error descargando MD");
+  if (!res.ok) throw new Error(`No se pudo descargar MD: ${rawUrl}`);
   const text = await res.text();
+
   let metadata = {};
   let md = text;
 
@@ -106,9 +125,7 @@ async function fetchMarkdownWithFrontmatter(rawUrl) {
   return { content: md, metadata };
 }
 
-/**
- * Parser YAML mini (clave: valor por línea) — suficiente para título/fecha/autor/excerpt/cover
- */
+/* YAML simple (clave: valor) */
 function parseYAML(yaml) {
   const meta = {};
   yaml.split("\n").forEach(line => {
@@ -116,7 +133,6 @@ function parseYAML(yaml) {
     if (idx > -1) {
       const key = line.slice(0, idx).trim();
       let value = line.slice(idx + 1).trim();
-      // quitar comillas si las hay
       if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
         value = value.slice(1, -1);
       }
@@ -126,16 +142,14 @@ function parseYAML(yaml) {
   return meta;
 }
 
-/**
- * Crea una tarjeta de contenido
- */
+/* Construir tarjeta */
 function buildCard(md, meta, collection) {
   const div = document.createElement("article");
   div.className = "card";
 
   const img = document.createElement("img");
   img.className = "media";
-  img.alt = meta.title || "Imagen de la publicación";
+  img.alt = meta.title || "Imagen";
   img.src = meta.cover || placeholderFromCollection(collection);
 
   const content = document.createElement("div");
@@ -158,7 +172,8 @@ function buildCard(md, meta, collection) {
 
   const excerpt = document.createElement("p");
   excerpt.className = "excerpt";
-  const html = marked.parse(meta.excerpt || md.slice(0, 180) + "…");
+  const summary = meta.excerpt && meta.excerpt.trim().length ? meta.excerpt : md.slice(0, 180) + "…";
+  const html = (window.marked ? marked.parse(summary) : summary);
   excerpt.innerHTML = html;
 
   content.append(badge, title, metaLine, excerpt);
@@ -174,5 +189,5 @@ function placeholderFromCollection(coll){
 
 function formatDate(iso){
   const d = new Date(iso);
-  return d.toLocaleDateString("es-UY", { year:"numeric", month:"short", day:"2-digit" });
+  return isNaN(d) ? "" : d.toLocaleDateString("es-UY", { year:"numeric", month:"short", day:"2-digit" });
 }
