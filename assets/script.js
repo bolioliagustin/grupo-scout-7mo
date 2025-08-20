@@ -1,5 +1,5 @@
 const GITHUB_OWNER = "bolioliagustin";   // ← reemplazar
-const GITHUB_REPO  = "grupo-scout-7mo"; // ← reemplazar
+const GITHUB_REPO = "grupo-scout-7mo"; // ← reemplazar
 const BRANCH = "main";
 
 /* Estado de paginación */
@@ -67,7 +67,7 @@ async function loadCollection(collection, targetSelector, { append = false } = {
       return { content, metadata };
     }));
 
-    all.sort((a,b) => {
+    all.sort((a, b) => {
       const da = new Date(a.metadata.date || 0).getTime();
       const db = new Date(b.metadata.date || 0).getTime();
       return db - da;
@@ -99,7 +99,7 @@ async function loadCollection(collection, targetSelector, { append = false } = {
   }
 }
 
-function hideLoadMore(collection){
+function hideLoadMore(collection) {
   const key = collection; // "noticias" | "blog"
   const btn = document.querySelector(`[data-more="${key}"]`);
   if (btn) btn.style.display = "none";
@@ -159,9 +159,11 @@ function buildCard(md, meta, collection) {
   badge.className = "badge";
   badge.textContent = collection === "noticias" ? "Noticia" : "Blog";
 
-  const title = document.createElement("h3");
+  const title = document.createElement("a");
   title.className = "title";
   title.textContent = meta.title || "Sin título";
+  const slug = fileNameToSlug(meta.title || "post"); // función para limpiar
+  title.href = `post.html?type=${collection}&slug=${slug}`;
 
   const metaLine = document.createElement("div");
   metaLine.className = "meta";
@@ -181,13 +183,19 @@ function buildCard(md, meta, collection) {
   return div;
 }
 
-function placeholderFromCollection(coll){
+function fileNameToSlug(str){
+  return str.toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+}
+
+function placeholderFromCollection(coll) {
   return coll === "noticias"
     ? "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1200&q=70"
     : "https://images.unsplash.com/photo-1493244040629-496f6d136cc3?w=1200&q=70";
 }
 
-function formatDate(iso){
+function formatDate(iso) {
   const d = new Date(iso);
-  return isNaN(d) ? "" : d.toLocaleDateString("es-UY", { year:"numeric", month:"short", day:"2-digit" });
+  return isNaN(d) ? "" : d.toLocaleDateString("es-UY", { year: "numeric", month: "short", day: "2-digit" });
 }
